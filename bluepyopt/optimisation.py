@@ -19,6 +19,8 @@ Copyright (c) 2016, EPFL/Blue Brain Project
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+# pylint: disable=R0912
+
 
 import random
 
@@ -38,27 +40,25 @@ logger = logging.getLogger('__main__')
 # settings of the algorithm can be stored in objects of these classes
 
 
-# TODO investigate and rewrite this pickle method
-'''
-def _pickle_method(m):
-    """Override pickle method"""
-    if m.im_self is None:
-        return getattr, (m.im_class, m.im_func.func_name)
-    else:
-        return getattr, (m.im_self, m.im_func.func_name)
-
-copy_reg.pickle(types.MethodType, _pickle_method)
-'''
-
-
 class Optimisation(object):
 
     """Optimisation class"""
+
+    _instance_counter = 0
 
     def __init__(self, evaluator=None, eval_function=None,
                  use_scoop=False,
                  offspring_size=10):
         """Constructor"""
+
+        Optimisation._instance_counter += 1
+        if Optimisation._instance_counter > 1:
+            raise Exception(
+                'At the moment only one Optimisation object is allowed '
+                'to exist simultaneously')
+
+        self.deap_classnames = []
+
         self.evaluator = evaluator
         self.eval_function = eval_function
         self.model_params = evaluator.params
@@ -70,20 +70,21 @@ class Optimisation(object):
 
         self.setup_deap()
 
+    def __del__(self):
+        """Destructor"""
+        self.destroy_deap()
+
+    def create_deap_class(self, name, base, **kwargs):
+        """Create a class in deap.creator"""
+
+        deap.creator.create(name, base, **kwargs)
+        self.deap_classnames.append(name)
+
     def setup_deap(self):
         """Set up optimisation"""
 
         # Number of objectives
         OBJ_SIZE = len(self.objectives)
-
-        class Individual(list):
-
-            """Individual"""
-
-            def __init__(self, *args):
-                list.__init__(self, *args)
-                self.time = None
-                self.voltage = None
 
         class WeightedSumFitness(deap.base.Fitness):
 
@@ -111,15 +112,15 @@ class Optimisation(object):
         # Create a fitness function
         # By default DEAP selector will try to maximise fitness values,
         # so we add a -1 weight value to minise
-        deap.creator.create("Fitness",
-                            WeightedSumFitness,
-                            weights=[-1.0] * OBJ_SIZE)
+        self.create_deap_class("WeightedSumFitness",
+                               WeightedSumFitness,
+                               weights=[-1.0] * OBJ_SIZE)
 
         # Create an individual that consists of a list
-        deap.creator.create(
-            "Individual",
-            Individual,
-            fitness=deap.creator.Fitness)
+        self.create_deap_class(
+            "ListIndividual",
+            list,
+            fitness=deap.creator.WeightedSumFitness)
 
         # Set random seed
         random.seed(1)
@@ -162,7 +163,7 @@ class Optimisation(object):
         self.toolbox.register(
             "Individual",
             deap.tools.initIterate,
-            deap.creator.Individual,
+            deap.creator.ListIndividual,
             self.toolbox.uniformparams)
 
         # Register the population format. It is a list of individuals
@@ -206,10 +207,24 @@ class Optimisation(object):
             from scoop import futures
             self.toolbox.register("map", futures.map)
 
+            def _reduce_method(meth):
+                """Overwrite reduce"""
+                return (getattr, (meth.__self__, meth.__func__.__name__))
+            import copy_reg
+            import types
+            copy_reg.pickle(types.MethodType, _reduce_method)
+
         # import multiprocessing
 
         # pool = multiprocessing.Pool()
         # self.toolbox.register("map", pool.map)
+
+    def destroy_deap(self):
+        """Destroy deap class"""
+
+        for classname in self.deap_classnames:
+            delattr(deap.creator, classname)
+        Optimisation._instance_counter -= 1
 
     def run(self, max_ngen=10, continue_cp=False, cp_filename=None):
         """Run optimisation"""
