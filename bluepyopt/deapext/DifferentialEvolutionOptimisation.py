@@ -13,6 +13,10 @@ class DifferentialEvolutionOptimisation:
         self.toolbox = base.Toolbox()
         # Set up the toolbox here...
 
-    def run(self, max_ngen):
+    def run(self, max_ngen, population, toolbox, halloffame, stats, verbose=__debug__):
+        """Implement the Differential Evolution algorithm here"""
+        result = DifferentialEvolution(population, toolbox, max_ngen, halloffame, stats, verbose)
+        return result
         # Implement the Differential Evolution algorithm here...
         pass
+
