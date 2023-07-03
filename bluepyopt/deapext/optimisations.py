@@ -229,6 +229,8 @@ class DEAPOptimisation(bluepyopt.optimisations.Optimisation):
             self.toolbox.register("select", tools.selIBEA)
         elif self.selector_name == 'NSGA2':
             self.toolbox.register("select", deap.tools.emo.selNSGA2)
+        elif self.selector_name == 'differential_evolution':
+            self.toolbox.register("select", DifferentialEvolutionOptimisation)
         else:
             raise ValueError('DEAPOptimisation: Constructor selector_name '
                              'argument only accepts "IBEA" or "NSGA2"')
@@ -336,3 +338,4 @@ class IBEADEAPOptimisation(DEAPOptimisation):
         """Constructor"""
 
         super(IBEADEAPOptimisation, self).__init__(*args, **kwargs)
+
