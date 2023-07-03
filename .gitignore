@@ -1,6 +1,14 @@
 *.pyc
+*.swp
 x86_64
 /bluepyopt.egg-info/
 /build/
 /dist/
 .DS_Store
+/.tox
+.ipynb_checkpoints
+/.python-version
+/cov_reports
+.coverage
+coverage.xml
+.idea/

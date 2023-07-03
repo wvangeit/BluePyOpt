@@ -1,7 +1,7 @@
 """Tests of the main bluepyopt module"""
 
 """
-Copyright (c) 2016, EPFL/Blue Brain Project
+Copyright (c) 2016-2020, EPFL/Blue Brain Project
 
  This file is part of BluePyOpt <https://github.com/BlueBrain/BluePyOpt>
 
@@ -21,16 +21,11 @@ Copyright (c) 2016, EPFL/Blue Brain Project
 
 # pylint:disable=W0612
 
-import types
-import nose.tools as nt
+import pytest
+import numpy
 
 
+@pytest.mark.unit
 def test_import():
-    """BluePyOpt: test importing bluepyopt"""
+    """bluepyopt: test importing bluepyopt"""
     import bluepyopt  # NOQA
-
-
-def test_neuron_import():
-    """BluePyOpt: test if bluepyopt.neuron import was successful"""
-    import bluepyopt.importer  # NOQA
-    nt.assert_is_instance(bluepyopt.importer.neuron, types.ModuleType)

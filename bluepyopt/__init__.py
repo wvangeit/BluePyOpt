@@ -1,7 +1,7 @@
 """Init script"""
 
 """
-Copyright (c) 2016, EPFL/Blue Brain Project
+Copyright (c) 2016-2022, EPFL/Blue Brain Project
 
  This file is part of BluePyOpt <https://github.com/BlueBrain/BluePyOpt>
 
@@ -19,16 +19,34 @@ Copyright (c) 2016, EPFL/Blue Brain Project
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 
+# pylint: disable=W0611
+
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
-from .api import *  # NOQA
-from .importer import neuron  # NOQA
-from .optimisation import Optimisation  # NOQA
+from . import tools  # NOQA
 
-# TODO add license headers
-# TODO use logger module instead of print statements
+from .api import *  # NOQA
+import bluepyopt.optimisations
+import bluepyopt.deapext.algorithms
+import bluepyopt.stoppingCriteria
+import bluepyopt.deapext.optimisations
+import bluepyopt.deapext.optimisationsCMA
+
+# Add some backward compatibility for the time when DEAPoptimisation not in
+# deapext yet
+# TODO deprecate this
+bluepyopt.optimisations.DEAPOptimisation = \
+    bluepyopt.deapext.optimisations.DEAPOptimisation
+
+import bluepyopt.evaluators
+import bluepyopt.objectives
+import bluepyopt.parameters  # NOQA
+
 # TODO let objects read / write themselves using json
 # TODO create 'Variables' class
 # TODO use 'locations' instead of 'location'
+# TODO add island functionality to optimiser
+# TODO add plotting functionality
+# TODO show progress bar during optimisation

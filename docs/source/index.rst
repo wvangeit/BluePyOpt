@@ -3,14 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-BluePyOpt
-========
-BlueBrain Python Optimisation Library
+
+
+.. include:: ../../README.rst
+   :end-before: .. substitutions
 
 .. toctree::
    :maxdepth: 3
 
-   api
+   Home <self>
+   api.rst
 
 Indices and tables
 ==================
@@ -19,3 +21,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+.. |banner| image:: /logo/BluePyOptBanner.png
+.. |landscape_example| image:: ../../examples/simplecell/figures/landscape_example.png
