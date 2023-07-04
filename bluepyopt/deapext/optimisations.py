@@ -1,6 +1,6 @@
-"""Optimisation class"""
+'''Optimisation class'''
 
-"""
+'''
 Copyright (c) 2016-2022, EPFL/Blue Brain Project
 
  This file is part of BluePyOpt <https://github.com/BlueBrain/BluePyOpt>
@@ -17,7 +17,7 @@ Copyright (c) 2016-2022, EPFL/Blue Brain Project
  You should have received a copy of the GNU Lesser General Public License
  along with this library; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-"""
+'''
 
 # pylint: disable=R0912, R0914
 
@@ -46,7 +46,7 @@ logger = logging.getLogger('__main__')
 
 class WeightedSumFitness(deap.base.Fitness):
 
-    """Fitness that compares by weighted sum"""
+    '''Fitness that compares by weighted sum'''
 
     def __init__(self, values=(), obj_size=None):
         self.weights = [-1.0] * obj_size if obj_size is not None else [-1]
@@ -55,12 +55,12 @@ class WeightedSumFitness(deap.base.Fitness):
 
     @property
     def weighted_sum(self):
-        """Weighted sum of wvalues"""
+        '''Weighted sum of wvalues'''
         return sum(self.wvalues)
 
     @property
     def sum(self):
-        """Weighted sum of values"""
+        '''Weighted sum of values'''
         return sum(self.values)
 
     def __le__(self, other):
@@ -70,7 +70,7 @@ class WeightedSumFitness(deap.base.Fitness):
         return self.weighted_sum < other.weighted_sum
 
     def __deepcopy__(self, _):
-        """Override deepcopy"""
+        '''Override deepcopy'''
 
         cls = self.__class__
         result = cls.__new__(cls)
@@ -80,10 +80,10 @@ class WeightedSumFitness(deap.base.Fitness):
 
 class WSListIndividual(list):
 
-    """Individual consisting of list with weighted sum field"""
+    '''Individual consisting of list with weighted sum field'''
 
     def __init__(self, *args, **kwargs):
-        """Constructor"""
+        '''Constructor'''
         self.fitness = WeightedSumFitness(obj_size=kwargs['obj_size'])
         del kwargs['obj_size']
         super(WSListIndividual, self).__init__(*args, **kwargs)
@@ -91,7 +91,7 @@ class WSListIndividual(list):
 
 class DEAPOptimisation(bluepyopt.optimisations.Optimisation):
 
-    """DEAP Optimisation class"""
+    '''DEAP Optimisation class'''
 
     def __init__(self, evaluator=None,
                  use_scoop=False,
@@ -103,7 +103,7 @@ class DEAPOptimisation(bluepyopt.optimisations.Optimisation):
                  map_function=None,
                  hof=None,
                  selector_name=None):
-        """Constructor
+        '''Constructor
 
         Args:
             evaluator (Evaluator): Evaluator object
@@ -120,7 +120,7 @@ class DEAPOptimisation(bluepyopt.optimisations.Optimisation):
             hof (hof): Hall of Fame object
             selector_name (str): The selector used in the evolutionary
                 algorithm, possible values are 'IBEA' or 'NSGA2'
-        """
+        '''
 
         super(DEAPOptimisation, self).__init__(evaluator=evaluator)
 
@@ -146,7 +146,7 @@ class DEAPOptimisation(bluepyopt.optimisations.Optimisation):
         self.setup_deap()
 
     def setup_deap(self):
-        """Set up optimisation"""
+        '''Set up optimisation'''
 
         # Number of objectives
         OBJ_SIZE = len(self.evaluator.objectives)
@@ -230,10 +230,11 @@ class DEAPOptimisation(bluepyopt.optimisations.Optimisation):
         elif self.selector_name == 'NSGA2':
             self.toolbox.register("select", deap.tools.emo.selNSGA2)
         elif self.selector_name == 'differential_evolution':
+            from .DifferentialEvolutionOptimisation import DifferentialEvolutionOptimisation
             self.toolbox.register("select", DifferentialEvolutionOptimisation)
         else:
             raise ValueError('DEAPOptimisation: Constructor selector_name '
-                             'argument only accepts "IBEA" or "NSGA2"')
+                             'argument only accepts "IBEA", "NSGA2" or "differential_evolution"')
 
         import copyreg
         import types
@@ -261,7 +262,7 @@ class DEAPOptimisation(bluepyopt.optimisations.Optimisation):
             cp_period=None,
             parent_population=None,
             terminator=None):
-        """Run optimisation"""
+        '''Run optimisation'''
         # Allow run function to override offspring_size
         # TODO probably in the future this should not be an object field
         # anymore
@@ -332,10 +333,10 @@ class DEAPOptimisation(bluepyopt.optimisations.Optimisation):
 
 class IBEADEAPOptimisation(DEAPOptimisation):
 
-    """IBEA DEAP class"""
+    '''IBEA DEAP class'''
 
     def __init__(self, *args, **kwargs):
-        """Constructor"""
+        '''Constructor'''
 
         super(IBEADEAPOptimisation, self).__init__(*args, **kwargs)
 
